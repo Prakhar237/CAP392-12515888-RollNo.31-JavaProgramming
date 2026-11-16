@@ -1,28 +1,25 @@
-import java.util.ArrayList;
-
 class BrowserHistory {
-    ArrayList<String> pages=new ArrayList<>();
+    String[] pages=new String[5001];
     int pos=0;
+    int last=0;
 
     public BrowserHistory(String homepage) {
-        pages.add(homepage);
+        pages[0]=homepage;
     }
 
     public void visit(String url) {
-        while(pages.size()>pos+1){
-            pages.remove(pages.size()-1);
-        }
-        pages.add(url);
         pos++;
+        pages[pos]=url;
+        last=pos;
     }
 
     public String back(int steps) {
         pos=Math.max(0,pos-steps);
-        return pages.get(pos);
+        return pages[pos];
     }
 
     public String forward(int steps) {
-        pos=Math.min(pages.size()-1,pos+steps);
-        return pages.get(pos);
+        pos=Math.min(last,pos+steps);
+        return pages[pos];
     }
 }
