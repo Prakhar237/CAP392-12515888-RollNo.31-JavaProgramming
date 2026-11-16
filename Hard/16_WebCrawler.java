@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 class Solution {
     public List<String> crawl(String startUrl, HtmlParser htmlParser) {
         String host=URI.create(startUrl).getHost();
-        Set<String> seen=ConcurrentHashMap.newKeySet();
+        List<String> seen=new ArrayList<>();
         ExecutorService pool=Executors.newFixedThreadPool(8);
         AtomicInteger count=new AtomicInteger(1);
         CountDownLatch done=new CountDownLatch(1);
@@ -20,17 +20,26 @@ class Solution {
         }finally{
             pool.shutdown();
         }
-        return new ArrayList<>(seen);
+        return seen;
     }
 
-    void search(String url, String host, HtmlParser parser, Set<String> seen,
+    void search(String url, String host, HtmlParser parser, List<String> seen,
                 ExecutorService pool, AtomicInteger count, CountDownLatch done) {
         pool.execute(()->{
             try{
                 for(String link:parser.getUrls(url)){
-                    if(host.equals(URI.create(link).getHost()) && seen.add(link)){
-                        count.incrementAndGet();
-                        search(link,host,parser,seen,pool,count,done);
+                    if(host.equals(URI.create(link).getHost())){
+                        boolean add=false;
+                        synchronized(seen){
+                            if(!seen.contains(link)){
+                                seen.add(link);
+                                add=true;
+                            }
+                        }
+                        if(add){
+                            count.incrementAndGet();
+                            search(link,host,parser,seen,pool,count,done);
+                        }
                     }
                 }
             }finally{
