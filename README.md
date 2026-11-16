@@ -1,3 +1,7 @@
-# CAP392: Programming in Java
+# CAP392 CA3
 
-Repository initialized for Academic Task 3.
+LeetCode Java problems
+
+Easy - 9
+Medium - 5
+Hard - 2
